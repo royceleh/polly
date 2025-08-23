@@ -78,7 +78,7 @@ export default async function Home() {
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         {recentPolls.length === 0 ? (
           <div className="max-w-4xl mx-auto text-center py-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Prediction Markets</h2>
@@ -121,25 +121,25 @@ export default async function Home() {
         ) : (
           <div>
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-8 space-y-4 lg:space-y-0">
               <div>
                 <h2 className="text-3xl font-bold text-gray-900">Trending Markets</h2>
                 <p className="text-gray-600 mt-2">Latest prediction markets • Earn points for each prediction</p>
               </div>
-              <div className="flex space-x-3">
-                <Button asChild variant="outline">
+              <div className="flex flex-wrap gap-3">
+                <Button asChild variant="outline" size="sm">
                   <Link href="/dashboard">
                     <Trophy className="h-4 w-4 mr-2" />
                     Portfolio
                   </Link>
                 </Button>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" size="sm">
                   <Link href="/polls">
                     View All Markets
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>
-                <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                <Button asChild className="bg-blue-600 hover:bg-blue-700" size="sm">
                   <Link href="/polls/create">
                     <Plus className="h-4 w-4 mr-2" />
                     Create Market
@@ -149,7 +149,7 @@ export default async function Home() {
             </div>
 
             {/* Market Cards */}
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {recentPolls.map((poll) => (
                 <MarketPollCard key={poll.id} poll={poll} />
               ))}
