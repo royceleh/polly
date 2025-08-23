@@ -326,15 +326,25 @@ export async function getPollsWithResponses() {
       (polls || []).map(async (poll) => {
         if (poll.poll_type === 'binary') {
           // Handle binary polls (existing logic)
-          const { data: responses } = await supabase
+          const { data: responses, error: responsesError } = await supabase
             .from("poll_responses")
             .select("*")
             .eq("poll_id", poll.id)
+          
+          // Debug for specific poll
+          if (poll.id === '411e4729-4b1b-4f33-ae50-11e9477f1a39') {
+            console.log('DEBUG: Responses query result:', responses?.length, 'Error:', responsesError)
+          }
 
           const userResponse = user ? responses?.find((r: any) => r.user_id === user.id) : null
           const yesCount = responses?.filter((r: any) => r.answer === true).length || 0
           const noCount = responses?.filter((r: any) => r.answer === false).length || 0
           const totalCount = responses?.length || 0
+          
+          // Simple debug for specific poll
+          if (poll.id === '411e4729-4b1b-4f33-ae50-11e9477f1a39') {
+            console.log('DEBUG: Poll responses count:', responses?.length, 'Total:', totalCount, 'Yes:', yesCount, 'No:', noCount)
+          }
           
 
 
