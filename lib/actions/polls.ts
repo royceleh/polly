@@ -325,7 +325,7 @@ export async function getPollsWithResponses() {
     const processedPolls = await Promise.all(
       (polls || []).map(async (poll) => {
         if (poll.poll_type === 'binary') {
-          // Handle binary polls (existing logic)
+          // Handle binary polls (existing logic) - bypass RLS
           const { data: responses, error: responsesError } = await supabase
             .from("poll_responses")
             .select("*")
@@ -348,7 +348,7 @@ export async function getPollsWithResponses() {
           
 
 
-          return {
+          const result = {
             ...poll,
             user_response: userResponse,
             vote_counts: {
@@ -357,6 +357,17 @@ export async function getPollsWithResponses() {
               total: totalCount,
             },
           }
+          
+          // Debug for specific poll
+          if (poll.id === '411e4729-4b1b-4f33-ae50-11e9477f1a39') {
+            console.log('DEBUG: Final poll result:', {
+              id: result.id,
+              vote_counts: result.vote_counts,
+              user_response: result.user_response
+            })
+          }
+          
+          return result
         } else {
           // Handle multiple-option polls
           console.log("Processing multiple-option poll:", poll.id, "Options:", poll.poll_options)
