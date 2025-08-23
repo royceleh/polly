@@ -300,7 +300,7 @@ export async function getPollsWithResponses() {
       .from("polls")
       .select(`
         *,
-        poll_options (
+        poll_options!poll_id (
           id,
           option_text,
           created_at
