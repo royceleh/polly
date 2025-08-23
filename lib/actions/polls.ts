@@ -288,6 +288,13 @@ export async function getPolls() {
 
 export async function getPollsWithResponses() {
   const supabase = createServerActionClient({ cookies })
+  
+  // Create service role client to bypass RLS
+  const { createClient } = await import('@supabase/supabase-js')
+  const serviceSupabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
   // Get current user
   const {
@@ -325,11 +332,16 @@ export async function getPollsWithResponses() {
     const processedPolls = await Promise.all(
       (polls || []).map(async (poll) => {
         if (poll.poll_type === 'binary') {
-          // Handle binary polls (existing logic) - bypass RLS
-          const { data: responses, error: responsesError } = await supabase
+          // Handle binary polls - fetch responses separately to bypass RLS issues
+          console.log("Processing binary poll:", poll.id)
+          
+          // Use service role client to bypass RLS for vote counting
+          const { data: responses, error: responsesError } = await serviceSupabase
             .from("poll_responses")
             .select("*")
             .eq("poll_id", poll.id)
+          
+          console.log("Fetched binary responses:", responses?.length, "Error:", responsesError)
           
           // Debug for specific poll
           if (poll.id === '411e4729-4b1b-4f33-ae50-11e9477f1a39') {
