@@ -336,14 +336,7 @@ export async function getPollsWithResponses() {
           const noCount = responses?.filter((r: any) => r.answer === false).length || 0
           const totalCount = responses?.length || 0
           
-          // Debug logging for binary polls
-          console.log(`Binary poll ${poll.id} vote counts:`, {
-            responses: responses?.length,
-            yesCount,
-            noCount,
-            totalCount,
-            userResponse: userResponse ? userResponse.answer : null
-          })
+
 
           return {
             ...poll,
