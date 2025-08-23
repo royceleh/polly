@@ -218,56 +218,88 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
               ) : (
                 // Multiple-option poll voted state
                 <div className="space-y-3">
-                  {poll.options?.map((option) => {
-                    const voteCount = poll.option_vote_counts?.[option.id]?.count || 0;
-                    const percentage = poll.option_vote_counts?.[option.id]?.percentage || 0;
-                    const isSelected = selectedOption?.id === option.id;
+                  {(() => {
+                    // Sort options by percentage (descending), then alphabetically for ties
+                    const sortedOptions = poll.options?.slice().sort((a, b) => {
+                      const aPercentage = poll.option_vote_counts?.[a.id]?.percentage || 0;
+                      const bPercentage = poll.option_vote_counts?.[b.id]?.percentage || 0;
+                      
+                      if (aPercentage !== bPercentage) {
+                        return bPercentage - aPercentage; // Descending by percentage
+                      }
+                      return a.option_text.localeCompare(b.option_text); // Alphabetical for ties
+                    }) || [];
                     
-                    // Find the winning option (highest percentage)
-                    const winningPercentage = Math.max(...poll.options.map(opt => 
-                      poll.option_vote_counts?.[opt.id]?.percentage || 0
-                    ));
-                    const isWinning = percentage === winningPercentage && percentage > 0;
+                    // Get top 3 options, but always include user's selection if not in top 3
+                    const top3Options = sortedOptions.slice(0, 3);
+                    const userSelectedOption = selectedOption;
                     
-                    return (
-                      <div key={option.id} className="flex items-center space-x-3">
-                        <div className="w-20 flex-shrink-0">
-                          <span className="text-xs font-medium text-gray-900 truncate block">{option.option_text}</span>
-                        </div>
-                        <div className="flex-1 relative">
-                          <div className="w-full h-4 bg-gray-100/50 backdrop-blur-sm border border-gray-200/30 rounded-full overflow-hidden group-hover:bg-gray-100/70 transition-all duration-200">
-                            {/* Bar segment */}
-                            {voteCount > 0 ? (
-                              <div
-                                className={`h-full transition-all duration-300 ${
-                                  isWinning ? 'bg-blue-500' : 'bg-gray-300'
-                                }`}
-                                style={{ width: `${percentage}%` }}
-                              />
-                            ) : (
-                              <div className="h-full bg-gray-200" style={{ width: '100%' }} />
-                            )}
-                            
-                            {/* Percentage overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className={`text-xs font-medium ${
-                                voteCount > 0 ? 'text-white drop-shadow-sm' : 'text-gray-500'
-                              }`}>
-                                {voteCount === 0 ? '0%' : `${percentage}%`}
-                              </span>
-                            </div>
-                            
-                            {/* Selection indicator */}
-                            {isSelected && (
-                              <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
-                                <Check className="h-2.5 w-2.5 text-white drop-shadow-sm" />
+                    // If user's selection is not in top 3, replace the last one
+                    let displayOptions = top3Options;
+                    if (userSelectedOption && !top3Options.find(opt => opt.id === userSelectedOption.id)) {
+                      displayOptions = [...top3Options.slice(0, 2), userSelectedOption];
+                    }
+                    
+                    return displayOptions.map((option) => {
+                      const voteCount = poll.option_vote_counts?.[option.id]?.count || 0;
+                      const percentage = poll.option_vote_counts?.[option.id]?.percentage || 0;
+                      const isSelected = selectedOption?.id === option.id;
+                      
+                      // Find the winning option (highest percentage)
+                      const winningPercentage = Math.max(...poll.options.map(opt => 
+                        poll.option_vote_counts?.[opt.id]?.percentage || 0
+                      ));
+                      const isWinning = percentage === winningPercentage && percentage > 0;
+                      
+                      return (
+                        <div key={option.id} className="flex items-center space-x-3">
+                          <div className="w-20 flex-shrink-0">
+                            <span className="text-xs font-medium text-gray-900 truncate block">{option.option_text}</span>
+                          </div>
+                          <div className="flex-1 relative">
+                            <div className="w-full h-4 bg-gray-100/50 backdrop-blur-sm border border-gray-200/30 rounded-full overflow-hidden group-hover:bg-gray-100/70 transition-all duration-200">
+                              {/* Bar segment */}
+                              {voteCount > 0 ? (
+                                <div
+                                  className={`h-full transition-all duration-300 ${
+                                    isWinning ? 'bg-blue-500' : 'bg-gray-300'
+                                  }`}
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              ) : (
+                                <div className="h-full bg-gray-200" style={{ width: '100%' }} />
+                              )}
+                              
+                              {/* Percentage overlay */}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className={`text-xs font-medium ${
+                                  voteCount > 0 ? 'text-white drop-shadow-sm' : 'text-gray-500'
+                                }`}>
+                                  {voteCount === 0 ? '0%' : `${percentage}%`}
+                                </span>
                               </div>
-                            )}
+                              
+                              {/* Selection indicator */}
+                              {isSelected && (
+                                <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+                                  <Check className="h-2.5 w-2.5 text-white drop-shadow-sm" />
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    });
+                  })()}
+                  
+                  {/* Show indicator if there are more options */}
+                  {poll.options && poll.options.length > 3 && (
+                    <div className="text-center pt-2">
+                      <span className="text-xs text-gray-500">
+                        +{poll.options.length - 3} more options
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
