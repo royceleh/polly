@@ -349,6 +349,15 @@ export async function getPollsWithResponses() {
           // Handle multiple-option polls
           console.log("Processing multiple-option poll:", poll.id, "Options:", poll.poll_options)
           
+          // Fetch options separately to bypass potential RLS issues
+          const { data: options, error: optionsError } = await supabase
+            .from("poll_options")
+            .select("*")
+            .eq("poll_id", poll.id)
+            .order("created_at")
+          
+          console.log("Fetched options separately:", options, "Error:", optionsError)
+          
           const { data: optionVotes } = await supabase
             .from("poll_option_votes")
             .select("*")
@@ -359,7 +368,7 @@ export async function getPollsWithResponses() {
 
           // Calculate vote counts per option
           const optionVoteCounts: { [key: string]: { count: number; percentage: number } } = {}
-          poll.poll_options?.forEach((option: any) => {
+          options?.forEach((option: any) => {
             const count = optionVotes?.filter((v: any) => v.option_id === option.id).length || 0
             const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
             optionVoteCounts[option.id] = { count, percentage }
@@ -367,6 +376,7 @@ export async function getPollsWithResponses() {
 
           const result = {
             ...poll,
+            options: options || [], // Use separately fetched options
             user_response: userVote,
             vote_counts: {
               yes: 0, // Not applicable for multiple-option polls
