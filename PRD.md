@@ -1,8 +1,8 @@
-# PredictPoll - Product Requirements Document (PRD)
+# pollymkt - Product Requirements Document (PRD)
 
 ## Executive Summary
 
-**PredictPoll** is a prediction market platform that allows users to create, participate in, and earn rewards from yes/no prediction polls. The application features a gamified experience with a points system, rewards store, and comprehensive user dashboard.
+**pollymkt** is a prediction market platform that allows users to create, participate in, and earn rewards from yes/no prediction polls. The application features a gamified experience with a points system, rewards store, and comprehensive user dashboard.
 
 **Current Version:** 0.1.0  
 **Last Updated:** December 2024  
@@ -280,7 +280,7 @@ Browse Rewards → Select Reward → Point Validation → Transaction Processing
 
 ## Conclusion
 
-PredictPoll represents a solid foundation for a prediction market platform with core features implemented and a clear path for future enhancements. The current implementation provides a complete user experience from registration to reward redemption, with robust security and performance considerations in place.
+pollymkt represents a solid foundation for a prediction market platform with core features implemented and a clear path for future enhancements. The current implementation provides a complete user experience from registration to reward redemption, with robust security and performance considerations in place.
 
 The modular architecture and use of modern technologies position the application well for future growth and feature additions while maintaining code quality and user experience standards.
 

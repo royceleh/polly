@@ -8,8 +8,8 @@ const geist = Geist({
 })
 
 export const metadata: Metadata = {
-  title: "Supabase Auth with SSR",
-  description: "A Next.js application with Supabase authentication using SSR",
+  title: "pollymkt",
+  description: "A prediction market platform for creating and trading on yes/no polls",
     generator: 'v0.dev'
 }
 

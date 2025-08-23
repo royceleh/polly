@@ -1,4 +1,4 @@
-# PredictPoll - Local Development Setup Guide
+# pollymkt - Local Development Setup Guide
 
 ## Prerequisites
 
@@ -34,7 +34,7 @@ npm install
 2. Click "New Project"
 3. Choose your organization
 4. Enter project details:
-   - **Name:** `predictpoll` (or your preferred name)
+   - **Name:** `pollymkt` (or your preferred name)
    - **Database Password:** Generate a strong password
    - **Region:** Choose closest to your location
 5. Click "Create new project"
@@ -416,7 +416,7 @@ pnpm start
 ## Step 5: Verify Setup
 
 1. **Open your browser** and navigate to `http://localhost:3000`
-2. **You should see** the PredictPoll homepage
+2. **You should see** the pollymkt homepage
 3. **Click "Sign Up"** to create a new account
 4. **Verify authentication** works by logging in
 5. **Test poll creation** by creating a new poll

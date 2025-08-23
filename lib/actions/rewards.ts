@@ -23,8 +23,7 @@ export interface RewardRedemption {
 }
 
 export async function getActiveRewards(): Promise<Reward[]> {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   try {
     const { data: rewards, error } = await supabase
@@ -46,8 +45,7 @@ export async function getActiveRewards(): Promise<Reward[]> {
 }
 
 export async function getUserRedemptions(): Promise<RewardRedemption[]> {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   const {
     data: { user },
@@ -85,8 +83,7 @@ export async function getUserRedemptions(): Promise<RewardRedemption[]> {
 }
 
 export async function redeemReward(rewardId: string) {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   const {
     data: { user },
@@ -128,8 +125,7 @@ export async function redeemReward(rewardId: string) {
 }
 
 export async function getRewardStats() {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   const {
     data: { user },

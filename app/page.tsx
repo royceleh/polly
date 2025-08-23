@@ -19,7 +19,7 @@ export default async function Home() {
   }
 
   // Get the user from the server
-  const supabase = createClient()
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -40,7 +40,7 @@ export default async function Home() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-bold text-gray-900">PredictPoll</h1>
+              <h1 className="text-xl font-bold text-gray-900">pollymkt</h1>
               <div className="hidden md:flex items-center space-x-6 ml-8">
                 <Link href="/polls" className="text-sm font-medium text-gray-700 hover:text-gray-900">
                   Markets

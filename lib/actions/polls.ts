@@ -5,8 +5,7 @@ import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 
 export async function createPoll(prevState: any, formData: FormData) {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   // Get current user
   const {
@@ -98,8 +97,7 @@ export async function createPoll(prevState: any, formData: FormData) {
 }
 
 export async function votePoll(pollId: string, answer: boolean) {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   // Get current user
   const {
@@ -147,8 +145,7 @@ export async function votePoll(pollId: string, answer: boolean) {
 }
 
 export async function getUserPoints(userId?: string) {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   // Get current user if no userId provided
   let targetUserId = userId
@@ -190,8 +187,7 @@ export async function getUserPoints(userId?: string) {
 }
 
 export async function getUserStats() {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   const {
     data: { user },
@@ -237,8 +233,7 @@ export async function getUserStats() {
 }
 
 export async function getPolls() {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   try {
     const { data: polls, error } = await supabase.from("polls").select("*").order("created_at", { ascending: false })
@@ -256,8 +251,7 @@ export async function getPolls() {
 }
 
 export async function getPollsWithResponses() {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   // Get current user
   const {
@@ -313,8 +307,7 @@ export async function getPollsWithResponses() {
 }
 
 export async function getUserPolls() {
-  const cookieStore = cookies()
-  const supabase = createServerActionClient({ cookies: () => cookieStore })
+  const supabase = createServerActionClient({ cookies })
 
   const {
     data: { user },
