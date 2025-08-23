@@ -196,27 +196,47 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                 </div>
               ) : (
                 // Multiple-option poll voted state
-                <div className="space-y-2">
-                  {poll.options?.map((option) => (
-                    <div
-                      key={option.id}
-                      className={`flex items-center space-x-2 px-2 py-1 rounded text-xs ${
-                        selectedOption?.id === option.id
-                          ? "bg-blue-50 border border-blue-200"
-                          : "bg-gray-50 border border-gray-200"
-                      }`}
-                    >
-                      <CheckCircle
-                        className={`h-3 w-3 ${selectedOption?.id === option.id ? "text-blue-600" : "text-gray-400"}`}
-                      />
-                      <span className="font-medium flex-1">{option.option_text}</span>
-                      {poll.option_vote_counts?.[option.id] && (
-                        <span className="text-xs text-gray-500">
-                          {poll.option_vote_counts[option.id].percentage}%
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                <div className="space-y-3">
+                  {poll.options?.map((option) => {
+                    const voteCount = poll.option_vote_counts?.[option.id]?.count || 0;
+                    const percentage = poll.option_vote_counts?.[option.id]?.percentage || 0;
+                    const isSelected = selectedOption?.id === option.id;
+                    
+                    return (
+                      <div key={option.id} className="space-y-1">
+                        {/* Option label and percentage */}
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-medium text-gray-900">{option.option_text}</span>
+                          <span className="text-gray-600 font-medium">{percentage}%</span>
+                        </div>
+                        
+                        {/* Horizontal bar */}
+                        <div className="relative w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
+                          {/* Bar segment */}
+                          <div
+                            className={`h-full transition-all duration-300 ${
+                              isSelected ? 'bg-blue-500' : 'bg-gray-300'
+                            }`}
+                            style={{ width: `${Math.max(percentage, 2)}%` }}
+                          />
+                          
+                          {/* Vote count overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xs font-medium text-white drop-shadow-sm">
+                              {voteCount} votes
+                            </span>
+                          </div>
+                          
+                          {/* Selection indicator */}
+                          {isSelected && (
+                            <div className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-0.5">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -250,23 +270,30 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                 // Multiple-option poll voting state
                 <div className="space-y-2">
                   {poll.options && poll.options.length > 0 ? (
-                    poll.options.map((option) => (
-                      <Button
-                        key={option.id}
-                        onClick={() => handleVote(option.id)}
-                        disabled={isVoting}
-                        variant="outline"
-                        className="flex items-center justify-center space-x-1 h-7 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-xs w-full"
-                      >
-                        <CheckCircle className="h-3 w-3" />
-                        <span className="flex-1 text-left">{option.option_text}</span>
-                        {poll.option_vote_counts?.[option.id] && (
-                          <span className="text-xs text-gray-500">
-                            ({poll.option_vote_counts[option.id].percentage}%)
-                          </span>
-                        )}
-                      </Button>
-                    ))
+                    poll.options.map((option) => {
+                      const voteCount = poll.option_vote_counts?.[option.id]?.count || 0;
+                      const percentage = poll.option_vote_counts?.[option.id]?.percentage || 0;
+                      
+                      return (
+                        <Button
+                          key={option.id}
+                          onClick={() => handleVote(option.id)}
+                          disabled={isVoting}
+                          variant="outline"
+                          className="flex items-center justify-between h-8 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-xs w-full px-3"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="h-3 w-3" />
+                            <span className="text-left">{option.option_text}</span>
+                          </div>
+                          {voteCount > 0 && (
+                            <span className="text-xs text-gray-500">
+                              {voteCount} votes ({percentage}%)
+                            </span>
+                          )}
+                        </Button>
+                      );
+                    })
                   ) : (
                     <div className="text-center text-sm text-gray-500 py-2">
                       No options available
