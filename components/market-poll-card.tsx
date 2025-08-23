@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, XCircle, Users, TrendingUp, Clock } from "lucide-react"
+import { CheckCircle, XCircle, Users, TrendingUp, Clock, Check } from "lucide-react"
 import { votePoll } from "@/lib/actions/polls"
 import Image from "next/image"
 import { PollWithResponses, PollOption } from "@/lib/types/poll"
@@ -82,6 +82,16 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
   const selectedOption = getSelectedOption()
   const winningOption = getWinningOption()
 
+  // For binary polls - get user's vote
+  const getUserVote = () => {
+    if (isBinaryPoll && poll.user_response && 'answer' in poll.user_response) {
+      return poll.user_response.answer
+    }
+    return null
+  }
+
+  const userVote = getUserVote()
+
   return (
     <Card className="hover:shadow-lg transition-all duration-200 border border-gray-200 bg-white h-full">
       <CardContent className="p-3">
@@ -127,31 +137,61 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
           {hasVoted ? (
             <div className="flex-1">
               {isBinaryPoll ? (
-                // Binary poll voted state
-                <div className="flex gap-2">
-                  <div
-                    className={`flex items-center space-x-1 px-2 py-1 rounded text-xs ${
-                      poll.user_response && 'answer' in poll.user_response && poll.user_response.answer
-                        ? "bg-green-50 border border-green-200"
-                        : "bg-gray-50 border border-gray-200"
-                    }`}
-                  >
-                    <CheckCircle
-                      className={`h-3 w-3 ${poll.user_response && 'answer' in poll.user_response && poll.user_response.answer ? "text-green-600" : "text-gray-400"}`}
-                    />
-                    <span className="font-medium">Yes</span>
+                // Binary poll voted state - Modern horizontal bar design
+                <div className="space-y-3">
+                  {/* Vote Distribution Bar */}
+                  <div className="relative">
+                    <div className="w-full h-8 bg-gray-100 rounded-lg overflow-hidden flex">
+                      {/* Yes segment */}
+                      <div 
+                        className={`relative flex items-center justify-center transition-all duration-500 ${
+                          userVote === true ? 'ring-2 ring-green-500 ring-offset-1' : ''
+                        }`}
+                        style={{ width: `${yesPercentage}%` }}
+                      >
+                        <div className="w-full h-full bg-green-500 flex items-center justify-center">
+                          <span className="text-white text-xs font-semibold px-2">
+                            YES {yesPercentage}%
+                          </span>
+                        </div>
+                        {userVote === true && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Check className="h-4 w-4 text-white drop-shadow-sm" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* No segment */}
+                      <div 
+                        className={`relative flex items-center justify-center transition-all duration-500 ${
+                          userVote === false ? 'ring-2 ring-red-500 ring-offset-1' : ''
+                        }`}
+                        style={{ width: `${noPercentage}%` }}
+                      >
+                        <div className="w-full h-full bg-red-500 flex items-center justify-center">
+                          <span className="text-white text-xs font-semibold px-2">
+                            NO {noPercentage}%
+                          </span>
+                        </div>
+                        {userVote === false && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Check className="h-4 w-4 text-white drop-shadow-sm" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div
-                    className={`flex items-center space-x-1 px-2 py-1 rounded text-xs ${
-                      poll.user_response && 'answer' in poll.user_response && !poll.user_response.answer
-                        ? "bg-red-50 border border-red-200"
-                        : "bg-gray-50 border border-gray-200"
-                    }`}
-                  >
-                    <XCircle
-                      className={`h-3 w-3 ${poll.user_response && 'answer' in poll.user_response && !poll.user_response.answer ? "text-red-600" : "text-gray-400"}`}
-                    />
-                    <span className="font-medium">No</span>
+
+                  {/* Vote Counts */}
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span>Yes: {poll.vote_counts?.yes || 0} votes</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span>No: {poll.vote_counts?.no || 0} votes</span>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -177,27 +217,6 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                       )}
                     </div>
                   ))}
-                </div>
-              )}
-
-              {/* Results Bar for Binary Polls */}
-              {isBinaryPoll && totalVotes > 0 && (
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-green-600 font-medium">Yes {yesPercentage}%</span>
-                      <span className="text-red-600 font-medium">No {noPercentage}%</span>
-                    </div>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                    <div className="h-full flex">
-                      <div
-                        className="bg-green-500 transition-all duration-500"
-                        style={{ width: `${yesPercentage}%` }}
-                      />
-                      <div className="bg-red-500 transition-all duration-500" style={{ width: `${noPercentage}%` }} />
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
