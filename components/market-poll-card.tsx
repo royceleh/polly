@@ -138,123 +138,131 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
             <div className="flex-1">
               {isBinaryPoll ? (
                 // Binary poll voted state - Modern horizontal bar design
-                <div className="space-y-3">
-                  {/* Vote Distribution Bar */}
-                  <div className="relative">
-                    <div className="w-full h-8 bg-gray-100 rounded-lg overflow-hidden flex">
-                      {/* Yes segment */}
-                      {yesPercentage > 0 ? (
-                        <div 
-                          className={`relative flex items-center justify-center transition-all duration-500 ${
-                            userVote === true ? 'ring-2 ring-green-500 ring-offset-1' : ''
-                          }`}
-                          style={{ width: `${yesPercentage}%` }}
-                        >
-                          <div className="w-full h-full bg-green-500 flex items-center justify-center">
-                            <span className="text-white text-xs font-semibold px-2">
-                              YES {yesPercentage}%
+                <div className="space-y-2">
+                  {/* Yes option row */}
+                  <div className="flex items-center space-x-3">
+                    <div className="w-16 flex-shrink-0">
+                      <span className="text-xs font-medium text-gray-900 truncate block">Yes</span>
+                    </div>
+                    <div className="flex-1 relative">
+                      <div className="w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
+                        {yesPercentage > 0 ? (
+                          <div 
+                            className={`relative h-full transition-all duration-500 ${
+                              userVote === true ? 'ring-2 ring-green-500 ring-offset-1' : ''
+                            }`}
+                            style={{ width: `${yesPercentage}%` }}
+                          >
+                            <div className="w-full h-full bg-green-500 flex items-center justify-center">
+                              <span className="text-white text-xs font-semibold px-2">
+                                {yesPercentage}%
+                              </span>
+                            </div>
+                            {userVote === true && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Check className="h-3 w-3 text-white drop-shadow-sm" />
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="h-full bg-gray-200 flex items-center justify-center">
+                            <span className="text-gray-500 text-xs font-semibold">
+                              0%
                             </span>
                           </div>
-                          {userVote === true && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Check className="h-4 w-4 text-white drop-shadow-sm" />
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center bg-gray-200" style={{ width: '50%' }}>
-                          <span className="text-gray-500 text-xs font-semibold px-2">
-                            YES 0%
-                          </span>
-                        </div>
-                      )}
-                      
-                      {/* No segment */}
-                      {noPercentage > 0 ? (
-                        <div 
-                          className={`relative flex items-center justify-center transition-all duration-500 ${
-                            userVote === false ? 'ring-2 ring-red-500 ring-offset-1' : ''
-                          }`}
-                          style={{ width: `${noPercentage}%` }}
-                        >
-                          <div className="w-full h-full bg-red-500 flex items-center justify-center">
-                            <span className="text-white text-xs font-semibold px-2">
-                              NO {noPercentage}%
-                            </span>
-                          </div>
-                          {userVote === false && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Check className="h-4 w-4 text-white drop-shadow-sm" />
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center bg-gray-200" style={{ width: '50%' }}>
-                          <span className="text-gray-500 text-xs font-semibold px-2">
-                            NO 0%
-                          </span>
-                        </div>
-                      )}
+                        )}
+                      </div>
+                    </div>
+                    <div className="w-16 flex-shrink-0 text-right">
+                      <span className="text-xs text-gray-600">{poll.vote_counts?.yes || 0} votes</span>
                     </div>
                   </div>
 
-                  {/* Vote Counts */}
-                  <div className="flex justify-between text-xs text-gray-600">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span>Yes: {poll.vote_counts?.yes || 0} votes</span>
+                  {/* No option row */}
+                  <div className="flex items-center space-x-3">
+                    <div className="w-16 flex-shrink-0">
+                      <span className="text-xs font-medium text-gray-900 truncate block">No</span>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span>No: {poll.vote_counts?.no || 0} votes</span>
+                    <div className="flex-1 relative">
+                      <div className="w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
+                        {noPercentage > 0 ? (
+                          <div 
+                            className={`relative h-full transition-all duration-500 ${
+                              userVote === false ? 'ring-2 ring-red-500 ring-offset-1' : ''
+                            }`}
+                            style={{ width: `${noPercentage}%` }}
+                          >
+                            <div className="w-full h-full bg-red-500 flex items-center justify-center">
+                              <span className="text-white text-xs font-semibold px-2">
+                                {noPercentage}%
+                              </span>
+                            </div>
+                            {userVote === false && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Check className="h-3 w-3 text-white drop-shadow-sm" />
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="h-full bg-gray-200 flex items-center justify-center">
+                            <span className="text-gray-500 text-xs font-semibold">
+                              0%
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="w-16 flex-shrink-0 text-right">
+                      <span className="text-xs text-gray-600">{poll.vote_counts?.no || 0} votes</span>
                     </div>
                   </div>
                 </div>
               ) : (
                 // Multiple-option poll voted state
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {poll.options?.map((option) => {
                     const voteCount = poll.option_vote_counts?.[option.id]?.count || 0;
                     const percentage = poll.option_vote_counts?.[option.id]?.percentage || 0;
                     const isSelected = selectedOption?.id === option.id;
                     
                     return (
-                      <div key={option.id} className="space-y-1">
-                        {/* Option label and percentage */}
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-medium text-gray-900">{option.option_text}</span>
-                          <span className="text-gray-600 font-medium">{percentage}%</span>
+                      <div key={option.id} className="flex items-center space-x-3">
+                        <div className="w-20 flex-shrink-0">
+                          <span className="text-xs font-medium text-gray-900 truncate block">{option.option_text}</span>
                         </div>
-                        
-                        {/* Horizontal bar */}
-                        <div className="relative w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
-                          {/* Bar segment */}
-                          {voteCount > 0 ? (
-                            <div
-                              className={`h-full transition-all duration-300 ${
-                                isSelected ? 'bg-blue-500' : 'bg-gray-300'
-                              }`}
-                              style={{ width: `${percentage}%` }}
-                            />
-                          ) : (
-                            <div className="h-full bg-gray-200" style={{ width: '100%' }} />
-                          )}
-                          
-                          {/* Vote count overlay */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className={`text-xs font-medium ${
-                              voteCount > 0 ? 'text-white drop-shadow-sm' : 'text-gray-500'
-                            }`}>
-                              {voteCount === 0 ? 'No votes' : `${voteCount} votes`}
-                            </span>
-                          </div>
-                          
-                          {/* Selection indicator */}
-                          {isSelected && (
-                            <div className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-0.5">
-                              <Check className="h-2 w-2 text-white" />
+                        <div className="flex-1 relative">
+                          <div className="w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
+                            {/* Bar segment */}
+                            {voteCount > 0 ? (
+                              <div
+                                className={`h-full transition-all duration-300 ${
+                                  isSelected ? 'bg-blue-500' : 'bg-gray-300'
+                                }`}
+                                style={{ width: `${percentage}%` }}
+                              />
+                            ) : (
+                              <div className="h-full bg-gray-200" style={{ width: '100%' }} />
+                            )}
+                            
+                            {/* Vote count overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className={`text-xs font-medium ${
+                                voteCount > 0 ? 'text-white drop-shadow-sm' : 'text-gray-500'
+                              }`}>
+                                {voteCount === 0 ? 'No votes' : `${voteCount} votes`}
+                              </span>
                             </div>
-                          )}
+                            
+                            {/* Selection indicator */}
+                            {isSelected && (
+                              <div className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-0.5">
+                                <Check className="h-2 w-2 text-white" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="w-16 flex-shrink-0 text-right">
+                          <span className="text-xs text-gray-600">{percentage}%</span>
                         </div>
                       </div>
                     );
