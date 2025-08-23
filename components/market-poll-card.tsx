@@ -138,45 +138,42 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
             <div className="flex-1">
               {isBinaryPoll ? (
                 // Binary poll voted state - Modern horizontal bar design
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {/* Yes option row */}
                   <div className="flex items-center space-x-3">
                     <div className="w-16 flex-shrink-0">
                       <span className="text-xs font-medium text-gray-900 truncate block">Yes</span>
                     </div>
                     <div className="flex-1 relative">
-                      <div className="w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
+                      <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
                         {yesPercentage > 0 ? (
                           <div 
                             className={`relative h-full transition-all duration-500 ${
-                              userVote === true ? 'ring-2 ring-blue-500 ring-offset-1' : ''
+                              userVote === true ? 'ring-1 ring-blue-500' : ''
                             }`}
                             style={{ width: `${yesPercentage}%` }}
                           >
                             <div className={`w-full h-full flex items-center justify-center relative ${
                               yesPercentage >= noPercentage ? 'bg-blue-500' : 'bg-gray-300'
                             }`}>
-                              <span className="text-white text-xs font-semibold px-2">
+                              <span className="text-white text-xs font-medium">
                                 {yesPercentage}%
                               </span>
                               {userVote === true && (
                                 <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
-                                  <Check className="h-3 w-3 text-white drop-shadow-sm" />
+                                  <Check className="h-2.5 w-2.5 text-white drop-shadow-sm" />
                                 </div>
                               )}
                             </div>
                           </div>
                         ) : (
                           <div className="h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-500 text-xs font-semibold">
+                            <span className="text-gray-500 text-xs font-medium">
                               0%
                             </span>
                           </div>
                         )}
                       </div>
-                    </div>
-                    <div className="w-16 flex-shrink-0 text-right">
-                      <span className="text-xs text-gray-600">{yesPercentage}%</span>
                     </div>
                   </div>
 
@@ -186,44 +183,41 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                       <span className="text-xs font-medium text-gray-900 truncate block">No</span>
                     </div>
                     <div className="flex-1 relative">
-                      <div className="w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
+                      <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
                         {noPercentage > 0 ? (
                           <div 
                             className={`relative h-full transition-all duration-500 ${
-                              userVote === false ? 'ring-2 ring-blue-500 ring-offset-1' : ''
+                              userVote === false ? 'ring-1 ring-blue-500' : ''
                             }`}
                             style={{ width: `${noPercentage}%` }}
                           >
                             <div className={`w-full h-full flex items-center justify-center relative ${
                               noPercentage >= yesPercentage ? 'bg-blue-500' : 'bg-gray-300'
                             }`}>
-                              <span className="text-white text-xs font-semibold px-2">
+                              <span className="text-white text-xs font-medium">
                                 {noPercentage}%
                               </span>
                               {userVote === false && (
                                 <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
-                                  <Check className="h-3 w-3 text-white drop-shadow-sm" />
+                                  <Check className="h-2.5 w-2.5 text-white drop-shadow-sm" />
                                 </div>
                               )}
                             </div>
                           </div>
                         ) : (
                           <div className="h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-500 text-xs font-semibold">
+                            <span className="text-gray-500 text-xs font-medium">
                               0%
                             </span>
                           </div>
                         )}
                       </div>
                     </div>
-                    <div className="w-16 flex-shrink-0 text-right">
-                      <span className="text-xs text-gray-600">{noPercentage}%</span>
-                    </div>
                   </div>
                 </div>
               ) : (
                 // Multiple-option poll voted state
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {poll.options?.map((option) => {
                     const voteCount = poll.option_vote_counts?.[option.id]?.count || 0;
                     const percentage = poll.option_vote_counts?.[option.id]?.percentage || 0;
@@ -241,7 +235,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                           <span className="text-xs font-medium text-gray-900 truncate block">{option.option_text}</span>
                         </div>
                         <div className="flex-1 relative">
-                          <div className="w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
+                          <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
                             {/* Bar segment */}
                             {voteCount > 0 ? (
                               <div
@@ -266,13 +260,10 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                             {/* Selection indicator */}
                             {isSelected && (
                               <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
-                                <Check className="h-3 w-3 text-white drop-shadow-sm" />
+                                <Check className="h-2.5 w-2.5 text-white drop-shadow-sm" />
                               </div>
                             )}
                           </div>
-                        </div>
-                        <div className="w-16 flex-shrink-0 text-right">
-                          <span className="text-xs text-gray-600">{percentage}%</span>
                         </div>
                       </div>
                     );
