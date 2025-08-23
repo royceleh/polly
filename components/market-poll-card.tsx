@@ -118,7 +118,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
             {/* Question and Percentage */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between">
-                <h3 className="text-base font-medium text-gray-900 leading-tight pr-2">{poll.question}</h3>
+                <h3 className="text-sm md:text-base font-medium text-gray-900 leading-tight pr-2">{poll.question}</h3>
                 {totalVotes > 0 && (
                   <div className="flex-shrink-0">
                     <span className="text-sm font-bold text-gray-900">
@@ -142,7 +142,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                   {/* Yes option row */}
                   <div className="flex items-center space-x-3">
                     <div className="w-16 flex-shrink-0">
-                      <span className="text-xs font-medium text-gray-900 truncate block">Yes</span>
+                      <span className="text-xs font-normal text-gray-900 truncate block">Yes</span>
                     </div>
                     <div className="flex-1 relative">
                       <div className="w-full h-4 bg-gray-100/50 backdrop-blur-sm border border-gray-200/30 rounded-full overflow-hidden group-hover:bg-gray-100/70 transition-all duration-200">
@@ -156,7 +156,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                             <div className={`w-full h-full flex items-center justify-center relative ${
                               yesPercentage >= noPercentage ? 'bg-blue-500' : 'bg-gray-300'
                             }`}>
-                              <span className="text-white text-xs font-medium">
+                              <span className="text-white text-sm font-medium">
                                 {yesPercentage}%
                               </span>
                               {userVote === true && (
@@ -168,7 +168,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                           </div>
                         ) : (
                           <div className="h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-500 text-xs font-medium">
+                            <span className="text-gray-500 text-sm font-medium">
                               0%
                             </span>
                           </div>
@@ -180,7 +180,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                   {/* No option row */}
                   <div className="flex items-center space-x-3">
                     <div className="w-16 flex-shrink-0">
-                      <span className="text-xs font-medium text-gray-900 truncate block">No</span>
+                      <span className="text-xs font-normal text-gray-900 truncate block">No</span>
                     </div>
                     <div className="flex-1 relative">
                       <div className="w-full h-4 bg-gray-100/50 backdrop-blur-sm border border-gray-200/30 rounded-full overflow-hidden group-hover:bg-gray-100/70 transition-all duration-200">
@@ -194,7 +194,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                             <div className={`w-full h-full flex items-center justify-center relative ${
                               noPercentage >= yesPercentage ? 'bg-blue-500' : 'bg-gray-300'
                             }`}>
-                              <span className="text-white text-xs font-medium">
+                              <span className="text-white text-sm font-medium">
                                 {noPercentage}%
                               </span>
                               {userVote === false && (
@@ -206,7 +206,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                           </div>
                         ) : (
                           <div className="h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-500 text-xs font-medium">
+                            <span className="text-gray-500 text-sm font-medium">
                               0%
                             </span>
                           </div>
@@ -254,7 +254,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                       return (
                         <div key={option.id} className="flex items-center space-x-3">
                           <div className="w-20 flex-shrink-0">
-                            <span className="text-xs font-medium text-gray-900 truncate block">{option.option_text}</span>
+                            <span className="text-xs font-normal text-gray-900 truncate block">{option.option_text}</span>
                           </div>
                           <div className="flex-1 relative">
                             <div className="w-full h-4 bg-gray-100/50 backdrop-blur-sm border border-gray-200/30 rounded-full overflow-hidden group-hover:bg-gray-100/70 transition-all duration-200">
@@ -272,7 +272,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                               
                               {/* Percentage overlay */}
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <span className={`text-xs font-medium ${
+                                <span className={`text-sm font-medium ${
                                   voteCount > 0 ? 'text-white drop-shadow-sm' : 'text-gray-500'
                                 }`}>
                                   {voteCount === 0 ? '0%' : `${percentage}%`}
