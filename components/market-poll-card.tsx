@@ -208,7 +208,6 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
               {message.text}
             </div>
           )}
-          </div>
         </div>
       </CardContent>
     </Card>
