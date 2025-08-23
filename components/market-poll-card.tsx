@@ -47,6 +47,16 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
   const hasVoted = !!poll.user_response
   const isBinaryPoll = poll.poll_type === 'binary'
 
+  // Debug logging
+  console.log('Poll data:', {
+    id: poll.id,
+    poll_type: poll.poll_type,
+    options: poll.options,
+    optionsLength: poll.options?.length,
+    hasVoted,
+    isBinaryPoll
+  })
+
   // For binary polls
   const yesPercentage = isBinaryPoll && poll.vote_counts ? getPercentage(poll.vote_counts.yes, poll.vote_counts.total) : 0
   const noPercentage = isBinaryPoll && poll.vote_counts ? getPercentage(poll.vote_counts.no, poll.vote_counts.total) : 0
@@ -220,23 +230,29 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
               ) : (
                 // Multiple-option poll voting state
                 <div className="space-y-2">
-                  {poll.options?.map((option) => (
-                    <Button
-                      key={option.id}
-                      onClick={() => handleVote(option.id)}
-                      disabled={isVoting}
-                      variant="outline"
-                      className="flex items-center justify-center space-x-1 h-7 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-xs w-full"
-                    >
-                      <CheckCircle className="h-3 w-3" />
-                      <span className="flex-1 text-left">{option.option_text}</span>
-                      {poll.option_vote_counts?.[option.id] && (
-                        <span className="text-xs text-gray-500">
-                          ({poll.option_vote_counts[option.id].percentage}%)
-                        </span>
-                      )}
-                    </Button>
-                  ))}
+                  {poll.options && poll.options.length > 0 ? (
+                    poll.options.map((option) => (
+                      <Button
+                        key={option.id}
+                        onClick={() => handleVote(option.id)}
+                        disabled={isVoting}
+                        variant="outline"
+                        className="flex items-center justify-center space-x-1 h-7 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-xs w-full"
+                      >
+                        <CheckCircle className="h-3 w-3" />
+                        <span className="flex-1 text-left">{option.option_text}</span>
+                        {poll.option_vote_counts?.[option.id] && (
+                          <span className="text-xs text-gray-500">
+                            ({poll.option_vote_counts[option.id].percentage}%)
+                          </span>
+                        )}
+                      </Button>
+                    ))
+                  ) : (
+                    <div className="text-center text-sm text-gray-500 py-2">
+                      No options available
+                    </div>
+                  )}
                 </div>
               )}
             </div>

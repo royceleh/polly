@@ -341,13 +341,7 @@ export async function getPollsWithResponses() {
           // Handle multiple-option polls
           const { data: optionVotes } = await supabase
             .from("poll_option_votes")
-            .select(`
-              *,
-              poll_options (
-                id,
-                option_text
-              )
-            `)
+            .select("*")
             .eq("poll_id", poll.id)
 
           const userVote = user ? optionVotes?.find((v: any) => v.user_id === user.id) : null
