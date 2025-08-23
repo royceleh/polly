@@ -95,7 +95,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                   </div>
                 )}
               </div>
-
+            </div>
 
             {/* Voting Options */}
             {hasVoted ? (
