@@ -3,6 +3,7 @@
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
+import { CreatePollData } from "@/lib/types/poll"
 
 export async function createPoll(prevState: any, formData: FormData) {
   const supabase = createServerActionClient({ cookies })
@@ -20,6 +21,8 @@ export async function createPoll(prevState: any, formData: FormData) {
   // Get form data
   const question = formData.get("question")?.toString()
   const image = formData.get("image") as File
+  const pollType = formData.get("pollType")?.toString() as 'binary' | 'multiple'
+  const options = formData.getAll("options").map(opt => opt.toString()).filter(opt => opt.trim().length > 0)
 
   // Validate question
   if (!question || question.trim().length === 0) {
@@ -30,61 +33,84 @@ export async function createPoll(prevState: any, formData: FormData) {
     return { error: "Question must be 120 characters or less" }
   }
 
+  // Validate poll type
+  if (!pollType || !['binary', 'multiple'].includes(pollType)) {
+    return { error: "Invalid poll type" }
+  }
+
+  // Validate options for multiple-option polls
+  if (pollType === 'multiple') {
+    if (!options || options.length < 2) {
+      return { error: "Multiple-option polls must have at least 2 options" }
+    }
+    
+    for (const option of options) {
+      if (option.length > 100) {
+        return { error: "Each option must be 100 characters or less" }
+      }
+    }
+  }
+
   let imageUrl: string | null = null
 
   // Handle image upload if provided
   if (image && image.size > 0) {
-    // Validate image
-    if (!image.type.startsWith("image/")) {
-      return { error: "Please upload a valid image file" }
-    }
-
-    // Check file size (5MB limit)
     if (image.size > 5 * 1024 * 1024) {
-      return { error: "Image must be less than 5MB" }
+      return { error: "Image must be 5MB or less" }
     }
 
-    // Generate unique filename
-    const fileExt = image.name.split(".").pop()
-    const fileName = `${user.id}/${Date.now()}.${fileExt}`
+    const fileExt = image.name.split('.').pop()
+    const fileName = `${Math.random()}.${fileExt}`
 
-    try {
-      // Upload image to Supabase storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("poll-images")
-        .upload(fileName, image, {
-          cacheControl: "3600",
-          upsert: false,
-        })
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('poll-images')
+      .upload(fileName, image)
 
-      if (uploadError) {
-        console.error("Upload error:", uploadError)
-        return { error: "Failed to upload image. Please try again." }
-      }
-
-      // Get public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("poll-images").getPublicUrl(uploadData.path)
-
-      imageUrl = publicUrl
-    } catch (error) {
-      console.error("Image upload error:", error)
+    if (uploadError) {
+      console.error("Image upload error:", uploadError)
       return { error: "Failed to upload image. Please try again." }
     }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('poll-images')
+      .getPublicUrl(fileName)
+
+    imageUrl = publicUrl
   }
 
-  // Create poll in database
   try {
-    const { error: insertError } = await supabase.from("polls").insert({
-      user_id: user.id,
-      question: question.trim(),
-      image_url: imageUrl,
-    })
+    // Insert the poll
+    const { data: poll, error: pollError } = await supabase
+      .from("polls")
+      .insert({
+        user_id: user.id,
+        question: question.trim(),
+        image_url: imageUrl,
+        poll_type: pollType,
+      })
+      .select()
+      .single()
 
-    if (insertError) {
-      console.error("Database insert error:", insertError)
+    if (pollError) {
+      console.error("Poll insert error:", pollError)
       return { error: "Failed to create poll. Please try again." }
+    }
+
+    // Insert options for multiple-option polls
+    if (pollType === 'multiple' && poll) {
+      const optionsToInsert = options.map(optionText => ({
+        poll_id: poll.id,
+        option_text: optionText.trim()
+      }))
+
+      const { error: optionsError } = await supabase
+        .from("poll_options")
+        .insert(optionsToInsert)
+
+      if (optionsError) {
+        console.error("Options insert error:", optionsError)
+        return { error: "Failed to create poll options. Please try again." }
+      }
     }
 
     revalidatePath("/")
@@ -96,7 +122,7 @@ export async function createPoll(prevState: any, formData: FormData) {
   }
 }
 
-export async function votePoll(pollId: string, answer: boolean) {
+export async function votePoll(pollId: string, answer: boolean | string) {
   const supabase = createServerActionClient({ cookies })
 
   // Get current user
@@ -110,34 +136,94 @@ export async function votePoll(pollId: string, answer: boolean) {
   }
 
   try {
-    // Check if user already voted on this poll
-    const { data: existingResponse } = await supabase
-      .from("poll_responses")
-      .select("id")
-      .eq("poll_id", pollId)
-      .eq("user_id", user.id)
+    // Get poll details to determine type
+    const { data: poll, error: pollError } = await supabase
+      .from("polls")
+      .select("poll_type")
+      .eq("id", pollId)
       .single()
 
-    if (existingResponse) {
-      return { error: "You have already voted on this poll" }
+    if (pollError || !poll) {
+      return { error: "Poll not found" }
     }
 
-    // Insert the vote (points will be automatically incremented by trigger)
-    const { error: insertError } = await supabase.from("poll_responses").insert({
-      poll_id: pollId,
-      user_id: user.id,
-      answer,
-    })
+    if (poll.poll_type === 'binary') {
+      // Handle binary poll voting (existing logic)
+      const answerBool = answer as boolean
+      
+      // Check if user already voted on this poll
+      const { data: existingResponse } = await supabase
+        .from("poll_responses")
+        .select("id")
+        .eq("poll_id", pollId)
+        .eq("user_id", user.id)
+        .single()
 
-    if (insertError) {
-      console.error("Vote insert error:", insertError)
-      return { error: "Failed to record your vote. Please try again." }
+      if (existingResponse) {
+        return { error: "You have already voted on this poll" }
+      }
+
+      // Insert the vote (points will be automatically incremented by trigger)
+      const { error: insertError } = await supabase.from("poll_responses").insert({
+        poll_id: pollId,
+        user_id: user.id,
+        answer: answerBool,
+      })
+
+      if (insertError) {
+        console.error("Vote insert error:", insertError)
+        return { error: "Failed to record your vote. Please try again." }
+      }
+
+      revalidatePath("/")
+      revalidatePath("/polls")
+      revalidatePath("/dashboard")
+      return { success: `Vote recorded! You earned 1 point for answering "${answerBool ? "Yes" : "No"}".` }
+    } else {
+      // Handle multiple-option poll voting
+      const optionId = answer as string
+      
+      // Check if user already voted on this poll
+      const { data: existingVote } = await supabase
+        .from("poll_option_votes")
+        .select("id")
+        .eq("poll_id", pollId)
+        .eq("user_id", user.id)
+        .single()
+
+      if (existingVote) {
+        return { error: "You have already voted on this poll" }
+      }
+
+      // Verify the option exists for this poll
+      const { data: option, error: optionError } = await supabase
+        .from("poll_options")
+        .select("option_text")
+        .eq("id", optionId)
+        .eq("poll_id", pollId)
+        .single()
+
+      if (optionError || !option) {
+        return { error: "Invalid option selected" }
+      }
+
+      // Insert the vote
+      const { error: insertError } = await supabase.from("poll_option_votes").insert({
+        poll_id: pollId,
+        option_id: optionId,
+        user_id: user.id,
+      })
+
+      if (insertError) {
+        console.error("Option vote insert error:", insertError)
+        return { error: "Failed to record your vote. Please try again." }
+      }
+
+      revalidatePath("/")
+      revalidatePath("/polls")
+      revalidatePath("/dashboard")
+      return { success: `Vote recorded! You earned 1 point for selecting "${option.option_text}".` }
     }
-
-    revalidatePath("/")
-    revalidatePath("/polls")
-    revalidatePath("/dashboard")
-    return { success: `Vote recorded! You earned 1 point for answering "${answer ? "Yes" : "No"}".` }
   } catch (error) {
     console.error("Vote error:", error)
     return { error: "An unexpected error occurred. Please try again." }
@@ -147,88 +233,35 @@ export async function votePoll(pollId: string, answer: boolean) {
 export async function getUserPoints(userId?: string) {
   const supabase = createServerActionClient({ cookies })
 
-  // Get current user if no userId provided
+  // Get current user if userId not provided
   let targetUserId = userId
   if (!targetUserId) {
     const {
       data: { user },
     } = await supabase.auth.getUser()
-    if (!user) return 0
-    targetUserId = user.id
+    targetUserId = user?.id
+  }
+
+  if (!targetUserId) {
+    return 0
   }
 
   try {
-    const { data: userPoints, error } = await supabase
+    const { data: points, error } = await supabase
       .from("user_points")
       .select("points")
       .eq("user_id", targetUserId)
       .single()
 
     if (error) {
-      // If no points record exists, create one
-      if (error.code === "PGRST116") {
-        const { error: insertError } = await supabase.from("user_points").insert({ user_id: targetUserId, points: 0 })
-
-        if (insertError) {
-          console.error("Error creating user points:", insertError)
-          return 0
-        }
-        return 0
-      }
-      console.error("Error fetching user points:", error)
+      console.error("Error getting user points:", error)
       return 0
     }
 
-    return userPoints?.points || 0
+    return points?.points || 0
   } catch (error) {
     console.error("Error getting user points:", error)
     return 0
-  }
-}
-
-export async function getUserStats() {
-  const supabase = createServerActionClient({ cookies })
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return {
-      points: 0,
-      pollsAnswered: 0,
-      pollsCreated: 0,
-    }
-  }
-
-  try {
-    // Get user points
-    const points = await getUserPoints(user.id)
-
-    // Get polls answered count
-    const { count: pollsAnswered } = await supabase
-      .from("poll_responses")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-
-    // Get polls created count
-    const { count: pollsCreated } = await supabase
-      .from("polls")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-
-    return {
-      points,
-      pollsAnswered: pollsAnswered || 0,
-      pollsCreated: pollsCreated || 0,
-    }
-  } catch (error) {
-    console.error("Error getting user stats:", error)
-    return {
-      points: 0,
-      pollsAnswered: 0,
-      pollsCreated: 0,
-    }
   }
 }
 
@@ -236,10 +269,13 @@ export async function getPolls() {
   const supabase = createServerActionClient({ cookies })
 
   try {
-    const { data: polls, error } = await supabase.from("polls").select("*").order("created_at", { ascending: false })
+    const { data: polls, error } = await supabase
+      .from("polls")
+      .select("*")
+      .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("Error fetching polls:", error)
+      console.error("Error getting polls:", error)
       return []
     }
 
@@ -259,15 +295,14 @@ export async function getPollsWithResponses() {
   } = await supabase.auth.getUser()
 
   try {
-    // Get all polls with response counts
+    // Get all polls with their options
     const { data: polls, error } = await supabase
       .from("polls")
       .select(`
         *,
-        poll_responses (
+        poll_options (
           id,
-          answer,
-          user_id,
+          option_text,
           created_at
         )
       `)
@@ -279,25 +314,66 @@ export async function getPollsWithResponses() {
     }
 
     // Process polls to include user responses and vote counts
-    const processedPolls =
-      polls?.map((poll) => {
-        const responses = poll.poll_responses || []
-        const userResponse = user ? responses.find((r: any) => r.user_id === user.id) : null
+    const processedPolls = await Promise.all(
+      (polls || []).map(async (poll) => {
+        if (poll.poll_type === 'binary') {
+          // Handle binary polls (existing logic)
+          const { data: responses } = await supabase
+            .from("poll_responses")
+            .select("*")
+            .eq("poll_id", poll.id)
 
-        const yesCount = responses.filter((r: any) => r.answer === true).length
-        const noCount = responses.filter((r: any) => r.answer === false).length
-        const totalCount = responses.length
+          const userResponse = user ? responses?.find((r: any) => r.user_id === user.id) : null
+          const yesCount = responses?.filter((r: any) => r.answer === true).length || 0
+          const noCount = responses?.filter((r: any) => r.answer === false).length || 0
+          const totalCount = responses?.length || 0
 
-        return {
-          ...poll,
-          user_response: userResponse,
-          vote_counts: {
-            yes: yesCount,
-            no: noCount,
-            total: totalCount,
-          },
+          return {
+            ...poll,
+            user_response: userResponse,
+            vote_counts: {
+              yes: yesCount,
+              no: noCount,
+              total: totalCount,
+            },
+          }
+        } else {
+          // Handle multiple-option polls
+          const { data: optionVotes } = await supabase
+            .from("poll_option_votes")
+            .select(`
+              *,
+              poll_options (
+                id,
+                option_text
+              )
+            `)
+            .eq("poll_id", poll.id)
+
+          const userVote = user ? optionVotes?.find((v: any) => v.user_id === user.id) : null
+          const totalVotes = optionVotes?.length || 0
+
+          // Calculate vote counts per option
+          const optionVoteCounts: { [key: string]: { count: number; percentage: number } } = {}
+          poll.poll_options?.forEach((option: any) => {
+            const count = optionVotes?.filter((v: any) => v.option_id === option.id).length || 0
+            const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
+            optionVoteCounts[option.id] = { count, percentage }
+          })
+
+          return {
+            ...poll,
+            user_response: userVote,
+            vote_counts: {
+              yes: 0, // Not applicable for multiple-option polls
+              no: 0,
+              total: totalVotes,
+            },
+            option_vote_counts: optionVoteCounts,
+          }
         }
-      }) || []
+      })
+    )
 
     return processedPolls
   } catch (error) {
@@ -309,6 +385,7 @@ export async function getPollsWithResponses() {
 export async function getUserPolls() {
   const supabase = createServerActionClient({ cookies })
 
+  // Get current user
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -325,7 +402,7 @@ export async function getUserPolls() {
       .order("created_at", { ascending: false })
 
     if (error) {
-      console.error("Error fetching user polls:", error)
+      console.error("Error getting user polls:", error)
       return []
     }
 
@@ -333,5 +410,62 @@ export async function getUserPolls() {
   } catch (error) {
     console.error("Error getting user polls:", error)
     return []
+  }
+}
+
+export async function getUserStats() {
+  const supabase = createServerActionClient({ cookies })
+
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return {
+      totalPolls: 0,
+      totalVotes: 0,
+      totalPoints: 0,
+    }
+  }
+
+  try {
+    // Get user's polls
+    const { data: polls } = await supabase
+      .from("polls")
+      .select("id")
+      .eq("user_id", user.id)
+
+    // Get user's votes (binary polls)
+    const { data: binaryVotes } = await supabase
+      .from("poll_responses")
+      .select("id")
+      .eq("user_id", user.id)
+
+    // Get user's votes (multiple-option polls)
+    const { data: optionVotes } = await supabase
+      .from("poll_option_votes")
+      .select("id")
+      .eq("user_id", user.id)
+
+    // Get user's points
+    const { data: points } = await supabase
+      .from("user_points")
+      .select("points")
+      .eq("user_id", user.id)
+      .single()
+
+    return {
+      totalPolls: polls?.length || 0,
+      totalVotes: (binaryVotes?.length || 0) + (optionVotes?.length || 0),
+      totalPoints: points?.points || 0,
+    }
+  } catch (error) {
+    console.error("Error getting user stats:", error)
+    return {
+      totalPolls: 0,
+      totalVotes: 0,
+      totalPoints: 0,
+    }
   }
 }
