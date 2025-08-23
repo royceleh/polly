@@ -149,11 +149,13 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                         {yesPercentage > 0 ? (
                           <div 
                             className={`relative h-full transition-all duration-500 ${
-                              userVote === true ? 'ring-2 ring-green-500 ring-offset-1' : ''
+                              userVote === true ? 'ring-2 ring-blue-500 ring-offset-1' : ''
                             }`}
                             style={{ width: `${yesPercentage}%` }}
                           >
-                            <div className="w-full h-full bg-green-500 flex items-center justify-center relative">
+                            <div className={`w-full h-full flex items-center justify-center relative ${
+                              yesPercentage >= noPercentage ? 'bg-blue-500' : 'bg-gray-300'
+                            }`}>
                               <span className="text-white text-xs font-semibold px-2">
                                 {yesPercentage}%
                               </span>
@@ -174,7 +176,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                       </div>
                     </div>
                     <div className="w-16 flex-shrink-0 text-right">
-                      <span className="text-xs text-gray-600">{poll.vote_counts?.yes || 0} votes</span>
+                      <span className="text-xs text-gray-600">{yesPercentage}%</span>
                     </div>
                   </div>
 
@@ -188,11 +190,13 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                         {noPercentage > 0 ? (
                           <div 
                             className={`relative h-full transition-all duration-500 ${
-                              userVote === false ? 'ring-2 ring-red-500 ring-offset-1' : ''
+                              userVote === false ? 'ring-2 ring-blue-500 ring-offset-1' : ''
                             }`}
                             style={{ width: `${noPercentage}%` }}
                           >
-                            <div className="w-full h-full bg-red-500 flex items-center justify-center relative">
+                            <div className={`w-full h-full flex items-center justify-center relative ${
+                              noPercentage >= yesPercentage ? 'bg-blue-500' : 'bg-gray-300'
+                            }`}>
                               <span className="text-white text-xs font-semibold px-2">
                                 {noPercentage}%
                               </span>
@@ -213,7 +217,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                       </div>
                     </div>
                     <div className="w-16 flex-shrink-0 text-right">
-                      <span className="text-xs text-gray-600">{poll.vote_counts?.no || 0} votes</span>
+                      <span className="text-xs text-gray-600">{noPercentage}%</span>
                     </div>
                   </div>
                 </div>
@@ -224,6 +228,12 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                     const voteCount = poll.option_vote_counts?.[option.id]?.count || 0;
                     const percentage = poll.option_vote_counts?.[option.id]?.percentage || 0;
                     const isSelected = selectedOption?.id === option.id;
+                    
+                    // Find the winning option (highest percentage)
+                    const winningPercentage = Math.max(...poll.options.map(opt => 
+                      poll.option_vote_counts?.[opt.id]?.percentage || 0
+                    ));
+                    const isWinning = percentage === winningPercentage && percentage > 0;
                     
                     return (
                       <div key={option.id} className="flex items-center space-x-3">
@@ -236,7 +246,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                             {voteCount > 0 ? (
                               <div
                                 className={`h-full transition-all duration-300 ${
-                                  isSelected ? 'bg-blue-500' : 'bg-gray-300'
+                                  isWinning ? 'bg-blue-500' : 'bg-gray-300'
                                 }`}
                                 style={{ width: `${percentage}%` }}
                               />
@@ -244,19 +254,19 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                               <div className="h-full bg-gray-200" style={{ width: '100%' }} />
                             )}
                             
-                            {/* Vote count overlay */}
+                            {/* Percentage overlay */}
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className={`text-xs font-medium ${
                                 voteCount > 0 ? 'text-white drop-shadow-sm' : 'text-gray-500'
                               }`}>
-                                {voteCount === 0 ? 'No votes' : `${voteCount} votes`}
+                                {voteCount === 0 ? '0%' : `${percentage}%`}
                               </span>
                             </div>
                             
                             {/* Selection indicator */}
                             {isSelected && (
-                              <div className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-0.5">
-                                <Check className="h-2 w-2 text-white" />
+                              <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+                                <Check className="h-3 w-3 text-white drop-shadow-sm" />
                               </div>
                             )}
                           </div>
@@ -279,7 +289,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                     onClick={() => handleVote(true)}
                     disabled={isVoting}
                     variant="outline"
-                    className="flex items-center justify-center space-x-1 h-7 border-green-200 hover:bg-green-50 hover:border-green-300 text-green-700 font-medium text-xs flex-1"
+                    className="flex items-center justify-center space-x-1 h-7 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-xs flex-1"
                   >
                     <CheckCircle className="h-3 w-3" />
                     <span>Yes</span>
@@ -289,7 +299,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                     onClick={() => handleVote(false)}
                     disabled={isVoting}
                     variant="outline"
-                    className="flex items-center justify-center space-x-1 h-7 border-red-200 hover:bg-red-50 hover:border-red-300 text-red-700 font-medium text-xs flex-1"
+                    className="flex items-center justify-center space-x-1 h-7 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-xs flex-1"
                   >
                     <XCircle className="h-3 w-3" />
                     <span>No</span>
