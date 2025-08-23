@@ -96,117 +96,118 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Voting Options */}
-            {hasVoted ? (
-              <div className="space-y-2 mb-3 flex-1">
-                <div className="grid grid-cols-2 gap-2">
-                  <div
-                    className={`flex items-center space-x-2 px-2 py-2 rounded-lg ${
-                      poll.user_response?.answer
-                        ? "bg-green-50 border border-green-200"
-                        : "bg-gray-50 border border-gray-200"
-                    }`}
-                  >
-                    <CheckCircle
-                      className={`h-3 w-3 ${poll.user_response?.answer ? "text-green-600" : "text-gray-400"}`}
-                    />
-                    <span className="text-xs font-medium">Yes</span>
-                  </div>
-                  <div
-                    className={`flex items-center space-x-2 px-2 py-2 rounded-lg ${
-                      !poll.user_response?.answer
-                        ? "bg-red-50 border border-red-200"
-                        : "bg-gray-50 border border-gray-200"
-                    }`}
-                  >
-                    <XCircle
-                      className={`h-3 w-3 ${!poll.user_response?.answer ? "text-red-600" : "text-gray-400"}`}
-                    />
-                    <span className="text-xs font-medium">No</span>
-                  </div>
+          {/* Voting Options */}
+          {hasVoted ? (
+            <div className="space-y-2 mb-3 flex-1">
+              <div className="grid grid-cols-2 gap-2">
+                <div
+                  className={`flex items-center space-x-2 px-2 py-2 rounded-lg ${
+                    poll.user_response?.answer
+                      ? "bg-green-50 border border-green-200"
+                      : "bg-gray-50 border border-gray-200"
+                  }`}
+                >
+                  <CheckCircle
+                    className={`h-3 w-3 ${poll.user_response?.answer ? "text-green-600" : "text-gray-400"}`}
+                  />
+                  <span className="text-xs font-medium">Yes</span>
                 </div>
+                <div
+                  className={`flex items-center space-x-2 px-2 py-2 rounded-lg ${
+                    !poll.user_response?.answer
+                      ? "bg-red-50 border border-red-200"
+                      : "bg-gray-50 border border-gray-200"
+                  }`}
+                >
+                  <XCircle
+                    className={`h-3 w-3 ${!poll.user_response?.answer ? "text-red-600" : "text-gray-400"}`}
+                  />
+                  <span className="text-xs font-medium">No</span>
+                </div>
+              </div>
 
-                {/* Results Bar */}
-                {totalVotes > 0 && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center space-x-4">
-                        <span className="text-green-600 font-medium">Yes {yesPercentage}%</span>
-                        <span className="text-red-600 font-medium">No {noPercentage}%</span>
-                      </div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                      <div className="h-full flex">
-                        <div
-                          className="bg-green-500 transition-all duration-500"
-                          style={{ width: `${yesPercentage}%` }}
-                        />
-                        <div className="bg-red-500 transition-all duration-500" style={{ width: `${noPercentage}%` }} />
-                      </div>
+              {/* Results Bar */}
+              {totalVotes > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-4">
+                      <span className="text-green-600 font-medium">Yes {yesPercentage}%</span>
+                      <span className="text-red-600 font-medium">No {noPercentage}%</span>
                     </div>
                   </div>
-                )}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-2 mb-3 flex-1">
-                <Button
-                  onClick={() => handleVote(true)}
-                  disabled={isVoting}
-                  variant="outline"
-                  className="flex items-center justify-center space-x-1 h-8 border-green-200 hover:bg-green-50 hover:border-green-300 text-green-700 font-medium text-xs"
-                >
-                  <CheckCircle className="h-3 w-3" />
-                  <span>Yes</span>
-                  {totalVotes > 0 && <span className="text-xs">({yesPercentage}%)</span>}
-                </Button>
-                <Button
-                  onClick={() => handleVote(false)}
-                  disabled={isVoting}
-                  variant="outline"
-                  className="flex items-center justify-center space-x-1 h-8 border-red-200 hover:bg-red-50 hover:border-red-300 text-red-700 font-medium text-xs"
-                >
-                  <XCircle className="h-3 w-3" />
-                  <span>No</span>
-                  {totalVotes > 0 && <span className="text-xs">({noPercentage}%)</span>}
-                </Button>
-              </div>
-            )}
-
-            {/* Bottom Stats */}
-            <div className="flex items-center justify-between text-xs text-gray-500 mt-auto">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-1">
-                  <Users className="h-3 w-3" />
-                  <span>{totalVotes.toLocaleString()}</span>
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div className="h-full flex">
+                      <div
+                        className="bg-green-500 transition-all duration-500"
+                        style={{ width: `${yesPercentage}%` }}
+                      />
+                      <div className="bg-red-500 transition-all duration-500" style={{ width: `${noPercentage}%` }} />
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Clock className="h-3 w-3" />
-                  <span>{new Date(poll.created_at).toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}</span>
-                </div>
-              </div>
-              {hasVoted && (
-                <Badge variant="outline" className="text-xs">
-                  Voted
-                </Badge>
               )}
             </div>
-
-            {/* Success/Error Messages */}
-            {message && (
-              <div
-                className={`mt-2 p-2 rounded text-xs ${
-                  message.type === "success"
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+          ) : (
+            <div className="grid grid-cols-2 gap-2 mb-3 flex-1">
+              <Button
+                onClick={() => handleVote(true)}
+                disabled={isVoting}
+                variant="outline"
+                className="flex items-center justify-center space-x-1 h-8 border-green-200 hover:bg-green-50 hover:border-green-300 text-green-700 font-medium text-xs"
               >
-                {message.text}
+                <CheckCircle className="h-3 w-3" />
+                <span>Yes</span>
+                {totalVotes > 0 && <span className="text-xs">({yesPercentage}%)</span>}
+              </Button>
+              <Button
+                onClick={() => handleVote(false)}
+                disabled={isVoting}
+                variant="outline"
+                className="flex items-center justify-center space-x-1 h-8 border-red-200 hover:bg-red-50 hover:border-red-300 text-red-700 font-medium text-xs"
+              >
+                <XCircle className="h-3 w-3" />
+                <span>No</span>
+                {totalVotes > 0 && <span className="text-xs">({noPercentage}%)</span>}
+              </Button>
+            </div>
+          )}
+
+          {/* Bottom Stats */}
+          <div className="flex items-center justify-between text-xs text-gray-500 mt-auto">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-1">
+                <Users className="h-3 w-3" />
+                <span>{totalVotes.toLocaleString()}</span>
               </div>
+              <div className="flex items-center space-x-1">
+                <Clock className="h-3 w-3" />
+                <span>{new Date(poll.created_at).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}</span>
+              </div>
+            </div>
+            {hasVoted && (
+              <Badge variant="outline" className="text-xs">
+                Voted
+              </Badge>
             )}
+          </div>
+
+          {/* Success/Error Messages */}
+          {message && (
+            <div
+              className={`mt-2 p-2 rounded text-xs ${
+                message.type === "success"
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : "bg-red-50 border border-red-200 text-red-800"
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
           </div>
         </div>
       </CardContent>
