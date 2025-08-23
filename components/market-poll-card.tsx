@@ -143,42 +143,58 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                   <div className="relative">
                     <div className="w-full h-8 bg-gray-100 rounded-lg overflow-hidden flex">
                       {/* Yes segment */}
-                      <div 
-                        className={`relative flex items-center justify-center transition-all duration-500 ${
-                          userVote === true ? 'ring-2 ring-green-500 ring-offset-1' : ''
-                        }`}
-                        style={{ width: `${yesPercentage}%` }}
-                      >
-                        <div className="w-full h-full bg-green-500 flex items-center justify-center">
-                          <span className="text-white text-xs font-semibold px-2">
-                            YES {yesPercentage}%
+                      {yesPercentage > 0 ? (
+                        <div 
+                          className={`relative flex items-center justify-center transition-all duration-500 ${
+                            userVote === true ? 'ring-2 ring-green-500 ring-offset-1' : ''
+                          }`}
+                          style={{ width: `${yesPercentage}%` }}
+                        >
+                          <div className="w-full h-full bg-green-500 flex items-center justify-center">
+                            <span className="text-white text-xs font-semibold px-2">
+                              YES {yesPercentage}%
+                            </span>
+                          </div>
+                          {userVote === true && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Check className="h-4 w-4 text-white drop-shadow-sm" />
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center bg-gray-200" style={{ width: '50%' }}>
+                          <span className="text-gray-500 text-xs font-semibold px-2">
+                            YES 0%
                           </span>
                         </div>
-                        {userVote === true && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Check className="h-4 w-4 text-white drop-shadow-sm" />
-                          </div>
-                        )}
-                      </div>
+                      )}
                       
                       {/* No segment */}
-                      <div 
-                        className={`relative flex items-center justify-center transition-all duration-500 ${
-                          userVote === false ? 'ring-2 ring-red-500 ring-offset-1' : ''
-                        }`}
-                        style={{ width: `${noPercentage}%` }}
-                      >
-                        <div className="w-full h-full bg-red-500 flex items-center justify-center">
-                          <span className="text-white text-xs font-semibold px-2">
-                            NO {noPercentage}%
+                      {noPercentage > 0 ? (
+                        <div 
+                          className={`relative flex items-center justify-center transition-all duration-500 ${
+                            userVote === false ? 'ring-2 ring-red-500 ring-offset-1' : ''
+                          }`}
+                          style={{ width: `${noPercentage}%` }}
+                        >
+                          <div className="w-full h-full bg-red-500 flex items-center justify-center">
+                            <span className="text-white text-xs font-semibold px-2">
+                              NO {noPercentage}%
+                            </span>
+                          </div>
+                          {userVote === false && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Check className="h-4 w-4 text-white drop-shadow-sm" />
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center bg-gray-200" style={{ width: '50%' }}>
+                          <span className="text-gray-500 text-xs font-semibold px-2">
+                            NO 0%
                           </span>
                         </div>
-                        {userVote === false && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Check className="h-4 w-4 text-white drop-shadow-sm" />
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
 
@@ -213,17 +229,23 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                         {/* Horizontal bar */}
                         <div className="relative w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
                           {/* Bar segment */}
-                          <div
-                            className={`h-full transition-all duration-300 ${
-                              isSelected ? 'bg-blue-500' : 'bg-gray-300'
-                            }`}
-                            style={{ width: `${Math.max(percentage, 2)}%` }}
-                          />
+                          {voteCount > 0 ? (
+                            <div
+                              className={`h-full transition-all duration-300 ${
+                                isSelected ? 'bg-blue-500' : 'bg-gray-300'
+                              }`}
+                              style={{ width: `${percentage}%` }}
+                            />
+                          ) : (
+                            <div className="h-full bg-gray-200" style={{ width: '100%' }} />
+                          )}
                           
                           {/* Vote count overlay */}
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-xs font-medium text-white drop-shadow-sm">
-                              {voteCount} votes
+                            <span className={`text-xs font-medium ${
+                              voteCount > 0 ? 'text-white drop-shadow-sm' : 'text-gray-500'
+                            }`}>
+                              {voteCount === 0 ? 'No votes' : `${voteCount} votes`}
                             </span>
                           </div>
                           
