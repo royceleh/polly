@@ -153,16 +153,16 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                             }`}
                             style={{ width: `${yesPercentage}%` }}
                           >
-                            <div className="w-full h-full bg-green-500 flex items-center justify-center">
+                            <div className="w-full h-full bg-green-500 flex items-center justify-center relative">
                               <span className="text-white text-xs font-semibold px-2">
                                 {yesPercentage}%
                               </span>
+                              {userVote === true && (
+                                <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+                                  <Check className="h-3 w-3 text-white drop-shadow-sm" />
+                                </div>
+                              )}
                             </div>
-                            {userVote === true && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <Check className="h-3 w-3 text-white drop-shadow-sm" />
-                              </div>
-                            )}
                           </div>
                         ) : (
                           <div className="h-full bg-gray-200 flex items-center justify-center">
@@ -192,16 +192,16 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                             }`}
                             style={{ width: `${noPercentage}%` }}
                           >
-                            <div className="w-full h-full bg-red-500 flex items-center justify-center">
+                            <div className="w-full h-full bg-red-500 flex items-center justify-center relative">
                               <span className="text-white text-xs font-semibold px-2">
                                 {noPercentage}%
                               </span>
+                              {userVote === false && (
+                                <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+                                  <Check className="h-3 w-3 text-white drop-shadow-sm" />
+                                </div>
+                              )}
                             </div>
-                            {userVote === false && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <Check className="h-3 w-3 text-white drop-shadow-sm" />
-                              </div>
-                            )}
                           </div>
                         ) : (
                           <div className="h-full bg-gray-200 flex items-center justify-center">
