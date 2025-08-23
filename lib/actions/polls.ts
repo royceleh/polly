@@ -313,6 +313,14 @@ export async function getPollsWithResponses() {
       return []
     }
 
+    // Debug logging
+    console.log("Raw polls data:", polls?.map(p => ({
+      id: p.id,
+      poll_type: p.poll_type,
+      options: p.poll_options,
+      optionsCount: p.poll_options?.length
+    })))
+
     // Process polls to include user responses and vote counts
     const processedPolls = await Promise.all(
       (polls || []).map(async (poll) => {
@@ -339,6 +347,8 @@ export async function getPollsWithResponses() {
           }
         } else {
           // Handle multiple-option polls
+          console.log("Processing multiple-option poll:", poll.id, "Options:", poll.poll_options)
+          
           const { data: optionVotes } = await supabase
             .from("poll_option_votes")
             .select("*")
@@ -355,7 +365,7 @@ export async function getPollsWithResponses() {
             optionVoteCounts[option.id] = { count, percentage }
           })
 
-          return {
+          const result = {
             ...poll,
             user_response: userVote,
             vote_counts: {
@@ -365,6 +375,14 @@ export async function getPollsWithResponses() {
             },
             option_vote_counts: optionVoteCounts,
           }
+          
+          console.log("Processed multiple-option poll result:", {
+            id: result.id,
+            options: result.options,
+            optionsLength: result.options?.length
+          })
+          
+          return result
         }
       })
     )
