@@ -93,14 +93,14 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
   const userVote = getUserVote()
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 border border-gray-200 bg-white h-full">
+    <Card className="group hover:scale-105 hover:shadow-lg transition-all duration-200 backdrop-blur-sm bg-white/90 border border-white/30 bg-gradient-to-br from-white/95 to-white/85 h-full cursor-pointer">
       <CardContent className="p-3">
         <div className="flex flex-col h-full space-y-2">
           {/* Header with Image and Question */}
           <div className="flex items-start space-x-2">
             {/* Poll Image/Icon */}
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100/50 backdrop-blur-sm border border-gray-200/30 flex items-center justify-center group-hover:bg-gray-100/70 transition-all duration-200">
                 {poll.image_url ? (
                   <Image
                     src={poll.image_url || "/placeholder.svg"}
@@ -145,7 +145,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                       <span className="text-xs font-medium text-gray-900 truncate block">Yes</span>
                     </div>
                     <div className="flex-1 relative">
-                      <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="w-full h-4 bg-gray-100/50 backdrop-blur-sm border border-gray-200/30 rounded-full overflow-hidden group-hover:bg-gray-100/70 transition-all duration-200">
                         {yesPercentage > 0 ? (
                           <div 
                             className={`relative h-full transition-all duration-500 ${
@@ -183,7 +183,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                       <span className="text-xs font-medium text-gray-900 truncate block">No</span>
                     </div>
                     <div className="flex-1 relative">
-                      <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="w-full h-4 bg-gray-100/50 backdrop-blur-sm border border-gray-200/30 rounded-full overflow-hidden group-hover:bg-gray-100/70 transition-all duration-200">
                         {noPercentage > 0 ? (
                           <div 
                             className={`relative h-full transition-all duration-500 ${
@@ -235,7 +235,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                           <span className="text-xs font-medium text-gray-900 truncate block">{option.option_text}</span>
                         </div>
                         <div className="flex-1 relative">
-                          <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="w-full h-4 bg-gray-100/50 backdrop-blur-sm border border-gray-200/30 rounded-full overflow-hidden group-hover:bg-gray-100/70 transition-all duration-200">
                             {/* Bar segment */}
                             {voteCount > 0 ? (
                               <div
@@ -280,7 +280,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                     onClick={() => handleVote(true)}
                     disabled={isVoting}
                     variant="outline"
-                    className="flex items-center justify-center space-x-1 h-7 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-xs flex-1"
+                    className="flex items-center justify-center space-x-1 h-7 border-gray-200/50 hover:bg-gray-50/80 hover:border-gray-300/70 text-gray-700 font-medium text-xs flex-1 backdrop-blur-sm bg-white/60 hover:scale-105 transition-all duration-200"
                   >
                     <CheckCircle className="h-3 w-3" />
                     <span>Yes</span>
@@ -290,7 +290,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                     onClick={() => handleVote(false)}
                     disabled={isVoting}
                     variant="outline"
-                    className="flex items-center justify-center space-x-1 h-7 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-xs flex-1"
+                    className="flex items-center justify-center space-x-1 h-7 border-gray-200/50 hover:bg-gray-50/80 hover:border-gray-300/70 text-gray-700 font-medium text-xs flex-1 backdrop-blur-sm bg-white/60 hover:scale-105 transition-all duration-200"
                   >
                     <XCircle className="h-3 w-3" />
                     <span>No</span>
@@ -311,7 +311,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
                           onClick={() => handleVote(option.id)}
                           disabled={isVoting}
                           variant="outline"
-                          className="flex items-center justify-between h-8 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-xs w-full px-3"
+                          className="flex items-center justify-between h-8 border-gray-200/50 hover:bg-gray-50/80 hover:border-gray-300/70 text-gray-700 font-medium text-xs w-full px-3 backdrop-blur-sm bg-white/60 hover:scale-105 transition-all duration-200"
                         >
                           <div className="flex items-center space-x-2">
                             <CheckCircle className="h-3 w-3" />
@@ -351,7 +351,7 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
               </div>
             </div>
             {hasVoted && (
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs backdrop-blur-sm bg-white/60 border-white/30">
                 Voted
               </Badge>
             )}
@@ -360,10 +360,10 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
           {/* Success/Error Messages */}
           {message && (
             <div
-              className={`p-1.5 rounded text-xs ${
+              className={`p-1.5 rounded text-xs backdrop-blur-sm border ${
                 message.type === "success"
-                  ? "bg-green-50 border border-green-200 text-green-800"
-                  : "bg-red-50 border border-red-200 text-red-800"
+                  ? "bg-green-50/80 border-green-200/50 text-green-800"
+                  : "bg-red-50/80 border-red-200/50 text-red-800"
               }`}
             >
               {message.text}

@@ -36,7 +36,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
+      <nav className="backdrop-blur-sm bg-white/90 border-b border-white/30 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -87,7 +87,7 @@ export default async function Home() {
             </p>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="group hover:scale-105 hover:shadow-lg transition-all duration-200 backdrop-blur-sm bg-white/90 border border-white/30 bg-gradient-to-br from-white/95 to-white/85 cursor-pointer">
                 <CardContent className="p-8">
                   <TrendingUp className="h-16 w-16 text-blue-600 mx-auto mb-6" />
                   <h3 className="text-xl font-semibold mb-3">Browse Markets</h3>
@@ -103,7 +103,7 @@ export default async function Home() {
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="group hover:scale-105 hover:shadow-lg transition-all duration-200 backdrop-blur-sm bg-white/90 border border-white/30 bg-gradient-to-br from-white/95 to-white/85 cursor-pointer">
                 <CardContent className="p-8">
                   <Plus className="h-16 w-16 text-green-600 mx-auto mb-6" />
                   <h3 className="text-xl font-semibold mb-3">Create Market</h3>
