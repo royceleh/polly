@@ -296,7 +296,8 @@ export async function getPollsWithResponses() {
     console.log('Environment check:', {
       hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       hasKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      keyLength: process.env.SUPABASE_SERVICE_ROLE_KEY?.length
+      keyLength: process.env.SUPABASE_SERVICE_ROLE_KEY?.length,
+      keyStart: process.env.SUPABASE_SERVICE_ROLE_KEY?.substring(0, 10) + '...'
     })
     
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -305,6 +306,14 @@ export async function getPollsWithResponses() {
         process.env.SUPABASE_SERVICE_ROLE_KEY
       )
       console.log('Service role client created successfully')
+      
+      // Test the client immediately
+      const { data: testData, error: testError } = await serviceSupabase
+        .from("polls")
+        .select("count")
+        .limit(1)
+      console.log('Service role client test:', { testData, testError })
+      
     } else {
       console.log('Service role environment variables not available')
     }
