@@ -293,14 +293,23 @@ export async function getPollsWithResponses() {
   let serviceSupabase = null
   try {
     const { createClient } = await import('@supabase/supabase-js')
+    console.log('Environment check:', {
+      hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      keyLength: process.env.SUPABASE_SERVICE_ROLE_KEY?.length
+    })
+    
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
       serviceSupabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL,
         process.env.SUPABASE_SERVICE_ROLE_KEY
       )
+      console.log('Service role client created successfully')
+    } else {
+      console.log('Service role environment variables not available')
     }
   } catch (error) {
-    console.warn('Service role client not available, falling back to regular client')
+    console.warn('Service role client not available, falling back to regular client:', error)
   }
 
   // Get current user
@@ -343,12 +352,25 @@ export async function getPollsWithResponses() {
           console.log("Processing binary poll:", poll.id)
           
           // Use service role client to bypass RLS for vote counting (with fallback)
-          const { data: responses, error: responsesError } = await (serviceSupabase || supabase)
+          const clientToUse = serviceSupabase || supabase
+          console.log("Using client type:", serviceSupabase ? "service role" : "regular")
+          
+          // Test the client with a simple query first
+          if (serviceSupabase) {
+            const { data: testData, error: testError } = await serviceSupabase
+              .from("poll_responses")
+              .select("count")
+              .eq("poll_id", poll.id)
+            console.log("Service role test query:", { testData, testError })
+          }
+          
+          const { data: responses, error: responsesError } = await clientToUse
             .from("poll_responses")
             .select("*")
             .eq("poll_id", poll.id)
           
           console.log("Fetched binary responses:", responses?.length, "Error:", responsesError)
+          console.log("Raw responses data:", responses)
           
           // Debug for specific poll
           if (poll.id === '411e4729-4b1b-4f33-ae50-11e9477f1a39') {
