@@ -54,7 +54,9 @@ export default function MarketPollCard({ poll }: MarketPollCardProps) {
     options: poll.options,
     optionsLength: poll.options?.length,
     hasVoted,
-    isBinaryPoll
+    isBinaryPoll,
+    voteCounts: poll.vote_counts,
+    userResponse: poll.user_response
   })
 
   // For binary polls
